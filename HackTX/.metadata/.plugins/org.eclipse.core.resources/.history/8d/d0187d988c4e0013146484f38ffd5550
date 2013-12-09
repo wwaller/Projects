@@ -1,0 +1,7 @@
+package thesaurus;
+
+public class Graph<K extends Comparable<K>> {
+	private class Node<K> {
+		Node<K>()
+	}
+}

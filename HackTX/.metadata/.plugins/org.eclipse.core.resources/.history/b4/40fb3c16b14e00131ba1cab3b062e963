@@ -1,0 +1,195 @@
+package thesaurus;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.Set;
+
+public class Graph<K extends Comparable<K>> {
+	Node<K> root;
+	
+	// Table of nodes, such that pointers to given nodes can be returned by key
+	Hashtable<K, Node<K>> nodeSet;
+	
+	public static void main(String[] args) throws FileNotFoundException {
+		Scanner scanner = new Scanner(new File("thesaurus.txt"));
+		
+		ArrayList<ArrayList<String>> adjacencyLists = new ArrayList<ArrayList<String>>();
+		
+		while (scanner.hasNextLine()) {
+			ArrayList<String> adjacencies = new ArrayList<String>();
+			
+			String line = scanner.nextLine();
+			Scanner lineScanner = new Scanner(line);
+			
+			if (line.equals("")) continue;
+			
+			while (lineScanner.hasNext()) {
+				adjacencies.add(lineScanner.next());
+			}
+			
+			adjacencyLists.add(adjacencies);
+		}
+		Graph<String> thesaurus = new Graph<String>(adjacencyLists);
+		System.out.println(thesaurus.lookupBreadth("funny").getData());
+	}
+	
+	public Graph(ArrayList<ArrayList<K>> adjacencyLists) {
+		nodeSet = new Hashtable<K, Node<K>>();
+		
+		// Construct the set of nodes 
+		for (ArrayList<K> list : adjacencyLists) {
+			K data = list.get(0);
+			Node<K> node = new Node(data);
+			
+			Random r = new Random();
+			if (root == null) {
+				root = node;
+			} else if (r.nextDouble() < .1) {
+				root = node;
+			}
+			
+			nodeSet.put(data, node);
+		}
+		
+		// Construct the connections between nodes
+		for (ArrayList<K> list : adjacencyLists) {
+			Node<K> node = nodeSet.get(list.get(0));
+			
+			if (node != null) {
+				for (K neighbor : list) {
+					Node<K> neighborNode = nodeSet.get(neighbor);
+					
+					if (neighborNode != null && neighborNode != node) {
+						node.addNeighbor(neighbor);
+					}
+				}
+			}
+		}
+	}
+	
+	public Node<K> lookupDepth(K data, Node<K> node) {
+		if (nodeSet == null) {
+			throw new RuntimeException("Graph has not been constructed yet");
+		}
+		
+		if (node.getData().equals(data)) {
+			return node;
+		}
+		
+		HashSet<HashSet<K>> edgeList = new HashSet<HashSet<K>>();
+
+		HashSet<K> neighbors = (HashSet<K>) node.getNeighbors();
+		HashSet<K> visitedNeighbors = (HashSet<K>) node.getVisitedNeighbors();
+		for (K neighbor : neighbors) {
+			HashSet<K> edge = new HashSet<K>();
+			edge.add(node.getData());
+			if (!visitedNeighbors.contains(neighbor)) {
+				edge.add(nodeSet.get(neighbor).getData());
+			}
+			edgeList.add(edge);
+		}
+		
+		for (HashSet<K> edge : edgeList) {
+			if (edge.size() != 2) continue;
+			
+			Iterator<K> it = edge.iterator();
+			
+			K vertex = it.next();
+			K vertexNeighbor;
+			if (!vertex.equals(node.getData())) {
+				K temp = vertex;
+				vertex = it.next();
+				vertexNeighbor = temp;
+			} else {
+				vertexNeighbor = it.next();
+			}
+			
+			Node<K> vertexNode = node;
+			Node<K> vertexNeighborNode = nodeSet.get(vertexNeighbor);	
+			
+			if (!visitedNeighbors.contains(vertexNeighbor)) {
+				node.addVisitedNeighbor(vertexNeighbor);
+				return lookupDepth(data, vertexNeighborNode);		
+			}
+		}
+		
+		return null;
+	}
+	
+	public Node<K> lookupBreadth(K data) {
+		LinkedList<Node<K>> queue = new LinkedList<Node<K>>();
+		queue.add(root);
+		
+		root.setVisited(true);
+		
+		while (!queue.isEmpty()) {
+			Node<K> node = queue.removeFirst();
+			HashSet<K> neighbors = (HashSet<K>) node.getNeighbors();
+			
+			if (node.getData().equals(data)) {
+				return node;
+			} else {
+				for (K key : neighbors) {
+					Node<K> neighborNode = nodeSet.get(key);
+					if (!neighborNode.getVisited()) {
+						neighborNode.setVisited(true);
+						queue.add(neighborNode);
+					}
+				}
+			}
+		}
+		
+		return null;
+		
+	}
+	
+	private class Node<K> {
+		K data;
+		boolean visited;
+		
+		HashSet<K> neighbors;
+		HashSet<K> visitedNeighbors;
+		
+		Node(K k) {
+			data = k;
+			neighbors = new HashSet<K>();
+			visitedNeighbors = new HashSet<K>();
+		}
+		
+		Set<K> getNeighbors() {
+			return neighbors;
+		}
+		
+		Set<K> getVisitedNeighbors() {
+			return visitedNeighbors;
+		}
+		
+		void addVisitedNeighbor(K node) {
+			visitedNeighbors.add(node);
+		}
+		
+		void addNeighbor(K node) {
+			neighbors.add(node);
+		}
+		
+		boolean getVisited() {
+			return visited;
+		}
+		
+		K getData() {
+			return data;
+		}
+		
+		void setVisited(boolean choice) {
+			visited = choice;
+		}
+		
+	}
+}

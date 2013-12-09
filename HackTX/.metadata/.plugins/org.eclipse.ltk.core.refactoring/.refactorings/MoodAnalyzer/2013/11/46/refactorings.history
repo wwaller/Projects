@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Rename compilation unit &apos;thesaurus.Thesaurus.java&apos; to &apos;Graph.java&apos;&#x0A;- Original project: &apos;MoodAnalyzer&apos;&#x0A;- Original element: &apos;thesaurus.Thesaurus.java&apos;&#x0A;- Renamed element: &apos;thesaurus.Graph.java&apos;" description="Rename compilation unit &apos;Thesaurus.java&apos;" flags="2" id="org.eclipse.jdt.ui.rename.compilationunit" input="/src&lt;thesaurus{Thesaurus.java" name="Graph.java" references="false" stamp="1384585151209" version="1.0"/>
+</session>

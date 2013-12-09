@@ -1,0 +1,28 @@
+package thesaurus;
+
+import java.util.HashSet;
+import java.util.Set;
+
+public class Graph<K extends Comparable<K>> {
+	Node<K> root;
+	
+	public Graph(ArrayList<ArrayList<K>> adjacencyLists) {
+		for (ArrayList<K> list : adjacencyLists) {
+			
+		}
+	}
+	
+	private class Node<K> {
+		K data;
+		
+		HashSet<K> neighbors;
+		
+		Node(K k) {
+			data = k;
+		}
+		
+		Set<K> getNeighbors() {
+			return neighbors;
+		}
+	}
+}
